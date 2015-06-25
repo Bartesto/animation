@@ -44,8 +44,8 @@ list.dirs <- function(path=".", pattern=NULL, all.dirs=FALSE,
 #all start with: date folder/...pre.ers. If it has collected extra folders (e.g.
 #perhaps suncorrected inside the processing folder) then these need to be removed
 #from the "result" object.
-test <- list.files(recursive = TRUE)
-result <- test[grep("*pre.ers", test)]
+allfiles <- list.files(recursive = TRUE)
+result <- allfiles[grep("*pre.ers", allfiles)]
 
 #get dates from .pre.ers not folders (discrepencies due to leap years)
 fdate <- as.Date(substr(result, 21, 26), "%d%m%y")
@@ -84,27 +84,27 @@ e <- extent(readOGR(dsn = "Z:\\DOCUMENTATION\\BART\\R\\R_DEV\\animation",
 red=5
 green=4
 blue=3
-combo="-543"
+combo="543"
+
 
 #timer
 start = Sys.time()
 for(i in 1:length(folds.no.7)){
         setwd(paste0(imdir, "\\", folds.no.7[i]))
         f <- list.files(pattern = '*pre.ers')
-        pname <- paste0(as.character(as.Date(substring(f, 12, 17), 
-                                             "%d%m%y")), combo, ".png")
+        date <- as.Date(substring(f, 12, 17),"%d%m%y")
+        pname <- paste0(date, "-", combo, ".png")
         fname <- paste0(here, "\\", pname)
+        plab <- format(date, "%b %Y")
         b <- crop(brick(f), e)
-        png(filename = fname, width = 1800, height = 600)
+        png(filename = fname, width = 1800, height = 750)
         par(mar=c(8,6,4,2)+0.1)
         plotRGB(b, red, green, blue, stretch = 'lin', axes = TRUE, 
-                main = basename(file_path_sans_ext(pname)))
+                main = plab)
         dev.off()
         
 }
 
-end = Sys.time() - start
-end
 #Back to working directory
 setwd(here)
 
@@ -115,7 +115,10 @@ file.rename(png.list, nname)
 
 #Create .gif animation
 ani.options(convert = 'C:/Program Files/ImageMagick-6.9.1-Q16/convert.exe',
-            ani.width = 1800, ani.height = 600, interval = 0.7, ani.dev = "png",
+            ani.width = 1800, ani.height = 750, interval = 0.7, ani.dev = "png",
             ani.type = "png", loop = 0)
 im.convert("*.png", output = "wal-animation-543-Jan88-Jun15.gif")
+
+end = Sys.time() - start
+end
 
