@@ -60,9 +60,7 @@ for(i in 1:length(folders)){
 }
 
 
-date = as.Date(substring(f, 12, 17), 
-                            "%d%m%y")
-date2 = format(date, "%b%Y")
+
 #Back to working directory
 setwd(here)
 
@@ -75,6 +73,6 @@ file.rename(png.list, nname)
 ani.options(convert = 'C:/Program Files/ImageMagick-6.9.1-Q16/convert.exe',
             ani.width = 1800, ani.height = 600, interval = 1.5, ani.dev = "png",
             ani.type = "png", loop = 0)
-im.convert("*.png", output = "wal-animation-543-June2014-June2015.gif")
+im.convert("*.png", output = "test.gif")
 
 
