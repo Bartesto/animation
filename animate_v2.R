@@ -6,6 +6,8 @@ library(tools)
 
 rm(list=ls())
 
+##USE FOR TESTING
+
 #Working location
 here <- "Z:\\DOCUMENTATION\\BART\\R\\R_DEV\\animation"
 #Image folders location
@@ -19,6 +21,8 @@ folders <- c("20140612", "20140628", "20140714", "20140730", "20140815",
              "20141119", "20141205", "20141221", "20150122", "20150207",
              "20150223", "20150311", "20150327", "20150412", "20150514",
              "20150615", "20150530")
+
+#folders <- c("20140612", "20140628")
 
 #Obtain extents from are of interest shape file
 e <- extent(readOGR(dsn = "Z:\\DOCUMENTATION\\BART\\R\\R_DEV\\animation", 
@@ -34,23 +38,31 @@ e <- extent(readOGR(dsn = "Z:\\DOCUMENTATION\\BART\\R\\R_DEV\\animation",
 red=5
 green=4
 blue=3
-combo="-543"
+combo="543"
 
 for(i in 1:length(folders)){
         setwd(paste0(imdir, "\\", folders[i]))
         f <- list.files(pattern = '*pre.ers')
         pname <- paste0(as.character(as.Date(substring(f, 12, 17), 
-                                             "%d%m%y")), combo, ".png")
+                                             "%d%m%y")), "-", combo, ".png")
+        date <- as.Date(substring(f, 12, 17),"%d%m%y")
         fname <- paste0(here, "\\", pname)
+        plab <- format(date, "%b %Y")
         b <- crop(brick(f), e)
         png(filename = fname, width = 1800, height = 600)
         par(mar=c(8,6,4,2)+0.1)
+#         plotRGB(b, red, green, blue, stretch = 'lin', axes = TRUE, 
+#                 main = file_path_sans_ext(pname))
         plotRGB(b, red, green, blue, stretch = 'lin', axes = TRUE, 
-                main = basename(file_path_sans_ext(pname)))
+                main = plab)
         dev.off()
         
 }
 
+
+date = as.Date(substring(f, 12, 17), 
+                            "%d%m%y")
+date2 = format(date, "%b%Y")
 #Back to working directory
 setwd(here)
 
