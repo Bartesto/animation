@@ -50,6 +50,7 @@ plotRGB(f, r=1, g=2, b=3)
 f <- brick(d)
 
 files2 <- list.files(pattern="out.*.tif$")
+#for name of png
 files3 <- files2
 extension(files3) <- '.png'
 png.name <- paste0(as.character(as.Date(substring(files3, 15, 20), "%d%m%y")), ".png")
@@ -64,11 +65,6 @@ for(i in 1:length(files2)) {
         
 file.rename(list.files(pattern=".png"), paste0("walyarta_", 1:length(png.name), ".png"))
 
-last.files <- list.files(pattern = ".png")
-ani.options(convert = 'C:/Program Files/ImageMagick-6.9.1-Q16/convert.exe')
-im.convert(last.files, output= 'test.gif')
-
-
 
 ##This works!!
 ani.options(convert = 'C:/Program Files/ImageMagick-6.9.1-Q16/convert.exe',
@@ -77,38 +73,12 @@ ani.options(convert = 'C:/Program Files/ImageMagick-6.9.1-Q16/convert.exe',
 im.convert("wal*.png", output = "wal-animation.gif")
 
 
+imdir <- "W:\\usgs\\111074\\20150615"
+setwd(imdir)
+setwd("Z:\\DOCUMENTATION\\BART\\R\\R_DEV\\animation")
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-##having png in plot
-img <- readPNG(system.file("img", "Rlogo.png", package="png"))
-g <- rasterGrob(img, interpolate=TRUE)
-
-qplot(1:10, 1:10, geom="blank") +
-        annotation_custom(g, xmin=-Inf, xmax=Inf, ymin=-Inf, ymax=Inf) +
-        geom_point() +
-        theme_bw()
-
-##Alternate
-migmap <- gmap(x = d, type = "hybrid", zoom = 9)
-
-migmaplv <- levelplot(f, layout= c(1,1), maxpixels = ncell(d),  
-                      panel = panel.levelplot.raster, interpolate = TRUE, colorkey = FALSE, 
-                      margin = FALSE)
-print(migmaplv)
-
-
-
-
+f <- list.files(pattern = "*pre.ers")
+b1 <- brick(f)
+b2 <- crop(b1, e)
+plotRGB(b2, 3,2,1, stretch = 'lin')
+plotRGB(b2, 5, 4, 3, stretch = 'lin')
