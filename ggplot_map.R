@@ -46,8 +46,8 @@ mb_df <- mb_df[complete.cases(mb_df),]
 mb_df[!complete.cases(mb_df),]
 
 ##create rgb fills outside of ggplot
-fill543 <- rgb(mb_df$b5,mb_df$b4,mb_df$b3, maxColorValue = 255)
-fill321 <- rgb(mb_df$b3,mb_df$b2,mb_df$b1, maxColorValue = 255)
+# fill543 <- rgb(mb_df$b5,mb_df$b4,mb_df$b3, maxColorValue = 255)
+# fill321 <- rgb(mb_df$b3,mb_df$b2,mb_df$b1, maxColorValue = 255)
 
 #shapes
 enclosure = readOGR(dsn=".", layer="Enclosure")
@@ -93,28 +93,34 @@ map <- ggplot() +
         labs(title="date of image here")
 
 
-map2 <- map + geom_path(data=enclosure.df, aes(x=long,y=lat,group=group), 
+p1 <- map + geom_path(data=enclosure.df, aes(x=long,y=lat,group=group), 
                   colour="yellow", size=1)+
         geom_path(data=site.df, aes(x=long,y=lat,group=group), 
                   colour="red", size=2)
 i=100
 dfsub <- dfall[i, ]
-ts <- ggplot()+
+p2 <- ggplot()+
         #geom_point(data = dfall, aes(x=x, y=y))+
         geom_point(data = dfsub, aes(x=x, y=y), colour = "red", shape = 10, size =5)+
         geom_line(data = dfall, aes(x=x, y=y))+
         geom_vline(xintercept = dfsub[,1], colour = "red")+
         theme_bw()+
         xlab("")+
-        ylab("i35 index")+
+        ylab("index")+
         
         coord_cartesian(xlim = c(6000, 16700),
                         ylim = c(20, 200))+
         theme(axis.ticks = element_blank(),
               axis.text.x = element_blank(),
-              legend.position = "none")+
-        coord_equal(ratio = 12)
-grid.arrange(map2, ts, nrow=2)
+              legend.position = "none")
+        #coord_equal(ratio = 12)
+#grid.arrange(map2, ts, nrow=2)
+png(filename = "test1.png", width = 1000, height = 1000)#, width = 842, height = 250
+grid.newpage() # Open a new page on grid device
+pushViewport(viewport(layout = grid.layout(7, 5)))
+print(p1, vp = viewport(layout.pos.row = 1:5, layout.pos.col = 1:5))
+print(p2, vp = viewport(layout.pos.row = 6:7, layout.pos.col = 2:4)) 
+dev.off()
 
 
 
