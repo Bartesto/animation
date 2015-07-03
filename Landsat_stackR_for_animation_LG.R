@@ -21,26 +21,26 @@ Landsat_stackR<- function(dir, zone, shp, shp.ID, pr, option){
         sitesSHP <- readShapePoly(shp, IDvar =  shp.ID, proj4string = prj)
         namesSHP<-rownames(sitesSHP@data)#Cool. Finds row names from IDvar supplied 
         
-        ####################################################
-        ##Code for 11078 example to match animation equence
+#         ####################################################
+#         ##Code for 11078 example to match animation equence
         allfiles <- list.files(recursive = TRUE)
         #get only those that end in .pre
         result <- allfiles[grepl("*pre.ers", allfiles)]
         #get only image date folders file paths
         result <- result[!grepl("Display*", result)]#remove display folder
-        #get just folders
+#         #get just folders
         fold <- substr(result, 1, 8)
-        #get just image date
-        imdate <- as.Date(fold, "%Y%m%d")
-        #get just sensor
-        sensor <- substr(result, 10, 11)
-        #make df
-        ind.df <- data.frame(s = sensor, d = imdate, stringsAsFactors = FALSE)
-        #create index to and remove l7 scan error images
-        nL7.index <- (ind.df$s == "l7") & (ind.df$d > as.Date("2003-05-30"))
-        folds.no.7 <- fold[!nL7.index]
-        date <- as.Date(folds.no.7, "%Y%m%d")
-        ###################################################
+#         #get just image date
+        imdate <- as.character(as.Date(fold, "%Y%m%d"))
+#         #get just sensor
+#         sensor <- substr(result, 10, 11)
+#         #make df
+#         ind.df <- data.frame(s = sensor, d = imdate, stringsAsFactors = FALSE)
+#         #create index to and remove l7 scan error images
+#         nL7.index <- (ind.df$s == "l7") & (ind.df$d > as.Date("2003-05-30"))
+#         folds.no.7 <- fold[!nL7.index]
+#         date <- as.Date(folds.no.7, "%Y%m%d")
+#         ###################################################
         
 #         get.list <- list.files(dir)#Normal file list
 #         get.list.fixed<-paste(dir,get.list,sep="\\")#Adds path
@@ -52,9 +52,10 @@ Landsat_stackR<- function(dir, zone, shp, shp.ID, pr, option){
         results.a<-as.data.frame(matrix(ncol=length(namesSHP), dimnames=list(NULL, namesSHP)))
         options<-c("i35", "ndvi", "b1", "b2", "b3", "b4", "b5", "b6")
         
-        for (i in 1:length(folds.no.7)){
-                
-                setwd(paste0(dir, "\\", folds.no.7[i]))
+        for (i in 1:length(fold)){
+                setwd(paste0(dir, "\\", fold[i]))
+#                 dir.i <- dirlistLong[i]
+#                 setwd(dir.i)
                 data.i<- list.files(pattern=paste('*pre.ers'))
                 b1R.i<-raster(data.i, band=1)
                 b2R.i<-raster(data.i, band=2)
@@ -109,8 +110,8 @@ Landsat_stackR<- function(dir, zone, shp, shp.ID, pr, option){
         setwd(dir)
         #keep <- rowSums(is.na(results.a)) < 6 #deletes first row of NA's
         results.a <- results.a[-1, ] 
-        results.a<-cbind(date, results.a)
-        write.csv(file=paste(pr,option,"test.csv", sep="_"), x=results.a)
+        results.a<-cbind(imdate, results.a)
+        write.csv(file=paste(pr,option,"test_ALL.csv", sep="_"), x=results.a)
 }
 
 ##Step 2
