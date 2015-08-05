@@ -56,10 +56,22 @@ enclosure@data$id <- rownames(enclosure@data)
 enclosure.points <- fortify(enclosure, region = "id")
 enclosure.df <- join(enclosure.points, enclosure@data, by = "id")
 
-site <- readOGR(dsn = ".", layer = "LG_monitor_sites_example_sml")
-site@data$id <- rownames(site@data)
-site.points <- fortify(site, region = "id")
-site.df <- join(site.points, site@data, by = "id")
+# LGsite1
+site1 <- readOGR(dsn = ".", layer = "LG_site1")
+site1@data$id <- rownames(site1@data)
+site1.points <- fortify(site1, region = "id")
+site1.df <- join(site1.points, site1@data, by = "id")
+
+# LGsite2
+site2 <- readOGR(dsn = ".", layer = "LG_site2")
+site2@data$id <- rownames(site2@data)
+site2.points <- fortify(site2, region = "id")
+site2.df <- join(site2.points, site1@data, by = "id")
+
+# site <- readOGR(dsn = ".", layer = "LG_monitor_sites_example_sml")
+# site@data$id <- rownames(site@data)
+# site.points <- fortify(site, region = "id")
+# site.df <- join(site.points, site@data, by = "id")
 
 # Read in time series data for demo site
 d <- read.csv("11078_i35_test_ALL.csv", header = TRUE)

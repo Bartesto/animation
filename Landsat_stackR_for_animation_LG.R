@@ -1,3 +1,5 @@
+
+
 rm(list = ls(all = T))#Clears workspace if required
 
 
@@ -118,6 +120,7 @@ Landsat_stackR<- function(dir, zone, shp, shp.ID, pr, option){
 
 dir="W:\\usgs\\110078"
 zone=51
+#shp="LG_site1.shp"
 shp="LG_monitor_sites_example.shp"
 shp.ID="NAME"
 pr=11078

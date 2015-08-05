@@ -4,7 +4,7 @@ rm(list=ls())
 # batch stretched and cropped to area of interest
 
 
-imdir <- "W:\\usgs\\110078\\LG_display_tiff"
+imdir <- "W:\\usgs\\110078"#\\LG_display_tiff
 pathrow <- substr(imdir, 9, 14)
 anidir <- "Z:\\DOCUMENTATION\\BART\\R\\R_DEV\\animation"
 setwd(imdir)
@@ -22,7 +22,7 @@ library(plyr)
 
 #read suncorrected image
 imname <- list.files(pattern = "pre.ers")
-gtname <- paste0("L_", as.Date(substr(imname, 12,17), "%d%m%y"), "_", pathrow, ".tiff")
+gtname <- paste0("L_", as.Date(substr(imname, 12,17), "%d%m%y"), "_", pathrow, ".tif")
 rawlt <- stack(imname)
 nlayers(rawlt)
 
@@ -129,3 +129,105 @@ dev.off()
 qplot(mpg, wt, data = mtcars) + coord_equal(ratio = 1)
 qplot(mpg, wt, data = mtcars) + coord_equal(ratio = 5)
 qplot(mpg, wt, data = mtcars) + coord_equal(ratio = 1/3)
+
+
+anidir <- "Z:\\DOCUMENTATION\\BART\\R\\R_DEV\\animation"
+setwd(anidir)
+d <- read.csv("11078_i35_test_ALL.csv", header = TRUE)
+d[,2] <- as.Date(d[,2], "%Y-%m-%d")
+d$dnum <- as.numeric(d[,2])
+df <- d[-1]
+##Code for 11078 example to match animation equence
+setwd("W:\\usgs\\110078")#imdir
+allfiles <- list.files(recursive = TRUE)
+#get only those that end in .pre
+result <- allfiles[grepl("*pre.ers", allfiles)]
+#get only image date folders file paths
+result <- result[!grepl("Display*", result)]#remove display folder
+#get just folders
+fold <- substr(result, 1, 8)
+#get just image date
+imdate <- as.Date(fold, "%Y%m%d")
+#get just sensor
+sensor <- substr(result, 10, 11)
+#make df of everything for indexing
+ind.df <- data.frame(s = sensor, d = imdate, stringsAsFactors = FALSE)
+#create index to and remove l7 scan error images
+nL7.index <- (ind.df$s == "l7") & (ind.df$d > as.Date("2003-05-30"))
+df2 <- df[which(!nL7.index), ]#use which!
+folds.no.7 <- fold[!nL7.index]#this used in images - CHECK lengths same
+
+
+date <- as.Date(folds.no.7, "%Y%m%d")
+
+#for LGS2
+x = df[,4]
+y = df[,2]
+dfall <- data.frame(x,y)
+ind <- length(x)
+ndate <- d$date
+
+
+i = 100
+
+#For LGS2 90m plot
+x = df[,4]
+y = df[,3]
+dfsml <- data.frame(x,y)
+dfsub <- dfsml[i, ]
+p1 <- ggplot()+
+        #geom_point(data = dfall, aes(x=x, y=y))+
+        geom_point(data = dfsub, aes(x=x, y=y), colour = "red", shape = 10, size =5)+
+        geom_line(data = dfsml, aes(x=x, y=y))+
+        geom_vline(xintercept = dfsub[,1], colour = "red")+
+        theme_bw()+
+        xlab("")+
+        ylab("index")+
+        
+        coord_cartesian(xlim = c(6000, 16700),
+                        ylim = c(20, 200))+
+        theme(axis.ticks = element_blank(),
+              axis.text.x = element_blank(),
+              legend.position = "none")
+#For LGRS landscape plot
+x1 = df[,4]
+y1 = df[,2]
+dflge <- data.frame(x1,y1)
+dfsub1 <- dflge[i, ]
+p2 <- ggplot()+
+        #geom_point(data = dfall, aes(x=x, y=y))+
+        geom_point(data = dfsub1, aes(x=x1, y=y1), colour = "red", shape = 10, size =5)+
+        geom_line(data = dflge, aes(x=x1, y=y1))+
+        geom_vline(xintercept = dfsub[,1], colour = "red")+
+        theme_bw()+
+        xlab("")+
+        ylab("index")+
+        
+        coord_cartesian(xlim = c(6000, 16700),
+                        ylim = c(20, 200))+
+        theme(axis.ticks = element_blank(),
+              axis.text.x = element_blank(),
+              legend.position = "none")
+
+grid.arrange(p1, p2, nrow=2)
+
+for (i in 1:ind){
+        dfsub <- dfall[i, ]
+        name.i <- paste0(ndate[i], "_LG.png")
+        ggobj <- ggplot()+
+                #geom_point(data = dfall, aes(x=x, y=y))+
+                geom_point(data = dfsub, aes(x=x, y=y), colour = "red", shape = 10, size =5)+
+                geom_line(data = dfall, aes(x=x, y=y))+
+                geom_vline(xintercept = dfsub[,1], colour = "red")+
+                theme_bw()+
+                xlab("")+
+                ylab("i35 index")+
+                coord_cartesian(xlim = c(6000, 16700),
+                                ylim = c(20, 200))+
+                theme(axis.ticks = element_blank(),
+                      axis.text.x = element_blank(),
+                      legend.position = "none")
+        png(filename = name.i, width = 842, height = 250)
+        print(ggobj)
+        dev.off()
+}
