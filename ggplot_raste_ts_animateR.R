@@ -80,7 +80,7 @@ d$dnum <- as.numeric(d[,2])
 df <- d[-1]
 
 # Code to trim to match animation sequence (remove Display folder and bad L7's)
-setwd("W:\\usgs\\110078")#imdir
+setwd("W:\\usgs\\110078")#imdir#
 allfiles <- list.files(recursive = TRUE)
 result <- allfiles[grepl("*pre.ers", allfiles)]
 result <- result[!grepl("Display*", result)]#remove display folder
