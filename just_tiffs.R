@@ -80,8 +80,8 @@ nL7.index <- (ind.df$s == "l7") & (ind.df$d > as.Date("2003-05-30"))
 sites.df <- df[which(!nL7.index), ]#use which!
 folds.no.7 <- fold[!nL7.index]#this used in images - CHECK lengths same
 
-for (i in 1:5){
-        #for (i in 1: length(folds.no.7)){
+#for (i in 1:5){
+for (i in 6: length(folds.no.7)){
         setwd(paste0(imdir, "\\", folds.no.7[i]))
         imname <- list.files(pattern = "pre.ers")
         gtname <- paste0("L_str_", as.Date(substr(imname, 12,17), "%d%m%y"), 
