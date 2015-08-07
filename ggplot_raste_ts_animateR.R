@@ -106,7 +106,7 @@ folds.no.7 <- fold[!nL7.index]#this used in images - CHECK lengths same
 ############################################################################
 # Manipulate raster data for image plot
 test1=c(1:5)
-for (i in 1:length(test1)){
+for (i in 1:5){
 #for (i in 1: length(folds.no.7)){
         setwd(paste0(imdir, "\\", folds.no.7[i]))
         imname <- list.files(pattern = "pre.ers")
