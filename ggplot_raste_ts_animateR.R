@@ -31,6 +31,8 @@ library(animation)
 library(grid)
 library(gridExtra)
 library(raster)
+library(gpclib)
+library(rgeos)
 library(rgdal)
 library(maptools)
 library(tools)
@@ -66,7 +68,14 @@ site1.df <- join(site1.points, site1@data, by = "id")
 site2 <- readOGR(dsn = ".", layer = "LG_site2")
 site2@data$id <- rownames(site2@data)
 site2.points <- fortify(site2, region = "id")
-site2.df <- join(site2.points, site1@data, by = "id")
+site2.df <- join(site2.points, site2@data, by = "id")
+
+# LGsites 1 and 2
+site3 <- readOGR(dsn=".", layer="LG_site_1_2")
+site3@data$id <- rownames(site3@data)
+#site3@data$NAME <- as.character(site3@data$NAME)
+site3.points <- fortify(site3, region = "id")
+site3.df <- join(site3.points, site3@data, by = "id")
 
 # site <- readOGR(dsn = ".", layer = "LG_monitor_sites_example_sml")
 # site@data$id <- rownames(site@data)
@@ -96,9 +105,9 @@ folds.no.7 <- fold[!nL7.index]#this used in images - CHECK lengths same
 
 ############################################################################
 # Manipulate raster data for image plot
-
-i=102
-for (i in 1: length(folds.no.7)){
+test1=c(1:5)
+for (i in 1:length(test1)){
+#for (i in 1: length(folds.no.7)){
         setwd(paste0(imdir, "\\", folds.no.7[i]))
         imname <- list.files(pattern = "pre.ers")
         gtname <- paste0("L_", as.Date(substr(imname, 12,17), "%d%m%y"), 
@@ -127,24 +136,42 @@ for (i in 1: length(folds.no.7)){
                                    labels=c(304000, 350000), expand = c(0,0)) +
                 scale_y_continuous(breaks=c(7090000, 7130000), 
                                    labels=c(7090000, 7130000), expand = c(0,0)) +
-                theme(panel.grid=element_blank(), plot.title = element_text(size = 10))+
+                theme(panel.grid=element_blank(), plot.title = element_text(size = 25))+
                 xlab("")+ ylab("")+
                 labs(title=rdate)
+        #plots only last site and enclosure
         p1 <- map + geom_path(data=enclosure.df, aes(x=long,y=lat,group=group), 
-                              colour="yellow", size=1)+
-                geom_path(data=site.df, aes(x=long,y=lat,group=group), 
-                          colour="red", size=2)
+                              colour="yellow", size=1)+#enclosure
+                   geom_path(data=site1.df, aes(x=long,y=lat,group=group), 
+                              colour="red", size=4)+#green site 1
+                   geom_path(data=site2.df, aes(x=long,y=lat,group=group), 
+                              colour="blue", size=4)#hot pink site 2
+        #plots all 3 but no map
+#         ggplot() + geom_path(data=enclosure.df, aes(x=long,y=lat,group=group), 
+#                              colour="yellow", size=1)+#enclosure
+#                 geom_path(data=site1.df, aes(x=long,y=lat,group=group), 
+#                           colour="#00FF00", size=2)+#green site 1
+#                 geom_path(data=site2.df, aes(x=long,y=lat,group=group), 
+#                           colour="#FF00CC", size=2)#hot pink site 2
+        #
+#         map + #geom_path(data=site3.df, aes(long, lat, group=NAME, color=NAME), size=2)+
+#                 geom_path(data=site1.df, aes(long, lat, group=NAME), color="#00FF00", size =2)+
+#                 geom_path(data=site2.df, aes(long, lat, group=NAME), color="#FF00CC", size =2)+
+#                 geom_path(data=enclosure.df, aes(x=long,y=lat,group=group), 
+#                           colour="yellow", size=1)
         
         #create ts ggplot object ####CHANGES!!!!!!!!!
-        x <- sites.df[, 4]
-        y <- sites.df[, 3]
-        dfall <- data.frame(x=x, y=200-y)##Flipped i35
-        dfsub <- dfall[i, ]
+        ##Site 1 Green
+        x.1 <- sites.df[, 5]
+        y.1 <- sites.df[, 2]
+        dfall.1 <- data.frame(x.1=x.1, y.1=200-y.1)##Flipped i35
+        dfsub.1 <- dfall.1[i, ]
         p2 <- ggplot()+
                 #geom_point(data = dfall, aes(x=x, y=y))+
-                geom_point(data = dfsub, aes(x=x, y=y), colour = "red", shape = 10, size =5)+
-                geom_line(data = dfall, aes(x=x, y=y))+
-                geom_vline(xintercept = dfsub[,1], colour = "red")+
+                geom_point(data = dfsub.1, aes(x=x.1, y=y.1), colour = "red", 
+                           shape = 10, size =5)+
+                geom_line(data = dfall.1, aes(x=x.1, y=y.1))+
+                geom_vline(xintercept = dfsub.1[,1], colour = "red")+
                 theme_bw()+
                 xlab("")+
                 ylab("index")+
@@ -154,11 +181,37 @@ for (i in 1: length(folds.no.7)){
                 theme(axis.ticks = element_blank(),
                       axis.text.x = element_blank(),
                       legend.position = "none")
-        png(filename = "testY.png", width = 1000, height = 1000)#, width = 842, height = 250
+        
+        ##Site 2 Hot Pink
+        x.2 <- sites.df[, 5]
+        y.2 <- sites.df[, 3]
+        dfall.2 <- data.frame(x.2=x.2, y.2=200-y.2)##Flipped i35
+        dfsub.2 <- dfall.2[i, ]
+        p3 <- ggplot()+
+                #geom_point(data = dfall, aes(x=x, y=y))+
+                geom_point(data = dfsub.2, aes(x=x.2, y=y.2), colour = "blue", 
+                           shape = 10, size =5)+
+                geom_line(data = dfall.2, aes(x=x.2, y=y.2))+
+                geom_vline(xintercept = dfsub.2[,1], colour = "blue")+
+                theme_bw()+
+                xlab("")+
+                ylab("index")+
+                
+                coord_cartesian(xlim = c(6000, 16700),
+                                ylim = c(0, 200))+
+                theme(axis.ticks = element_blank(),
+                      axis.text.x = element_blank(),
+                      legend.position = "none")
+        
+       
+        name.i <- paste0(substr(gtname[i], 3, 19), "_LG.png")
+        
+        png(filename = name.i, width = 1000, height = 1000)#, width = 842, height = 250
         grid.newpage() # Open a new page on grid device
-        pushViewport(viewport(layout = grid.layout(7, 5)))
+        pushViewport(viewport(layout = grid.layout(9, 5)))
         print(p1, vp = viewport(layout.pos.row = 1:5, layout.pos.col = 1:5))
-        print(p2, vp = viewport(layout.pos.row = 6:7, layout.pos.col = 2:4)) 
+        print(p2, vp = viewport(layout.pos.row = 6:7, layout.pos.col = 2:4))#site 1
+        print(p3, vp = viewport(layout.pos.row = 8:9, layout.pos.col = 2:4))#site 2
         dev.off()
         
         ##Clean up "C:\\Users\\barth\\AppData\\Local\\Temp\\R_raster_barth"
