@@ -98,6 +98,7 @@ for (i in 1: length(folds.no.7)){
 
 for (i in 1:length(folds.no.7)){
         setwd(tifdir)
+        #setwd("Z:\\DOCUMENTATION\\BART\\R\\R_DEV\\animation\\110078_ani_tifs_2015-08-07")
         t.names <- list.files(pattern = ".tif")
         t.name <- t.names[i]
         t.stack <- stack(t.name)
