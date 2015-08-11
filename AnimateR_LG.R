@@ -190,9 +190,9 @@ for (i in 1:length(folds.no.7)){
 ## png files need to be unambiguously renamed 0001 to (n) to ensure correct sequence in 
 ## gif animation creation. Ensure that you make a copy of the original png's before running
 
-#Rename png files to leading zero numbers to order correctly
-png.list <- list.files(pattern = '*LG.png')
-nname <- sprintf("%.4d.png", seq(png.list))
+#Rename png files to numbers to order correctly
+png.list <- list.files(pattern = '*.png')
+nname <- sprintf("img-%d.png", seq(png.list))
 file.rename(png.list, nname)
 
 ############################STAGE 5####################################################
@@ -201,4 +201,16 @@ file.rename(png.list, nname)
 ani.options(convert = 'C:/Program Files/ImageMagick-6.9.1-Q16/convert.exe',
             ani.width = 1800, ani.height = 750, interval = 0.7, ani.dev = "png",
             ani.type = "png", loop = 0)
-im.convert("*.png", output = "LG-i35_graph_fixed_ts.gif")
+im.convert("*.png", output = "LG-i35f_graph_fixed_ts.gif")
+
+#######################################################################################
+## If you want a mp4 instead you need to have FFmpeg installed and the ffmpeg.exe in 
+## your working directory. Open a cmd window and run
+
+# > ffmpeg -f image2 -r 2 -i img-%d.png -crf 5 your name here.mp4
+
+# r- 2 = is for speed between static images (low is slow)
+# -crf 5 = quality (low is high quality)
+ 
+
+
