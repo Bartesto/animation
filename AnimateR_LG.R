@@ -48,13 +48,13 @@ enclosure.df <- join(enclosure.points, enclosure@data, by = "id")
 # Create stand alone .csv for site data with lat long column
 # LGsite1 pt
 site1.df <- read.csv("site1_pt.csv", header = TRUE)
-site2.df <- read.csv("site2_pt.csv", header = TRUE)
+site3.df <- read.csv("site3_pt.csv", header = TRUE)
 
 # Read in time series data for demo site from StackR
-d <- read.csv("11078_i35_test_ALL.csv", header = TRUE)
-d[,2] <- as.Date(d[,2], "%Y-%m-%d")
+d <- read.csv("11078_i35_test_sites1_3clean.csv", header = TRUE, stringsAsFactors = FALSE)
+d[,2] <- as.Date(d[,2], "%d/%m/%Y")
 d$dnum <- as.numeric(d[,2])
-df <- d[-1]
+df <- d[,-1]
 
 # Code to trim to match animation sequence (remove Display folder and bad L7's)
 setwd(imdir)
@@ -68,7 +68,8 @@ sensor <- substr(result, 10, 11)#get just sensor
 ind.df <- data.frame(s = sensor, d = imdate, stringsAsFactors = FALSE)
 #create index to and remove l7 scan error images
 nL7.index <- (ind.df$s == "l7") & (ind.df$d > as.Date("2003-05-30"))
-sites.df <- df[which(!nL7.index), ]#use which!
+#sites.df <- df[which(!nL7.index), ]#use which!
+sites.df <- df
 folds.no.7 <- fold[!nL7.index]#this used in images - CHECK lengths same
 
 ############################STAGE 2####################################################
@@ -96,10 +97,15 @@ for (i in 1: length(folds.no.7)){
 ############################STAGE 3####################################################
 ## Create individual png files with polygons, points and incremental graphs
 
-for (i in 1:length(folds.no.7)){
-        setwd(tifdir)
+#special case due to manual deletion of cloudy images
+setwd(tifdir)
+new.folds <- as.numeric(length(list.files(pattern = ".tif")))
+t.names <- list.files(pattern = ".tif")
+
+for (i in 1:new.folds){#beware of change from folds.no.7
+        #setwd(tifdir)
         #setwd("Z:\\DOCUMENTATION\\BART\\R\\R_DEV\\animation\\110078_ani_tifs_2015-08-07")
-        t.names <- list.files(pattern = ".tif")
+        
         t.name <- t.names[i]
         t.stack <- stack(t.name)
         t.df <- raster::as.data.frame(t.stack, xy=T)
@@ -109,6 +115,7 @@ for (i in 1:length(folds.no.7)){
         t.df <- t.df[complete.cases(t.df),]#remove NA's
        
         rdate <- format(as.Date(substr(t.name, 7, 16), "%Y-%m-%d"), "%b %Y")
+        print(paste("processing: ", t.name))
         
         ## Create Plot objects
         # Base image with shape files
@@ -117,10 +124,10 @@ for (i in 1:length(folds.no.7)){
                 geom_tile(data=t.df, aes(x=x, y=y, fill=rgb(b5,b4,b3, 
                                                              maxColorValue = 255))) + 
                 scale_fill_identity() +
-                scale_x_continuous(breaks=c(304000, 350000),
-                                   labels=c(304000, 350000), expand = c(0,0)) +
-                scale_y_continuous(breaks=c(7090000, 7130000), 
-                                   labels=c(7090000, 7130000), expand = c(0,0)) +
+                scale_x_continuous(breaks=c(325000, 345000),
+                                   labels=c(325000, 345000), expand = c(0,0)) +
+                scale_y_continuous(breaks=c(7095000, 7105000), 
+                                   labels=c(7095000, 7105000), expand = c(0,0)) +
                 theme(panel.grid=element_blank(), plot.title = element_text(size = 25))+
                 xlab("")+ ylab("")+
                 labs(title=rdate)
@@ -129,11 +136,12 @@ for (i in 1:length(folds.no.7)){
                               colour="yellow", size=1)+#enclosure
                 geom_point(data=site1.df, aes(x=long,y=lat), 
                           colour="red", size=2.5)+#site 1
-                geom_point(data=site2.df, aes(x=long,y=lat), 
+                geom_point(data=site3.df, aes(x=long,y=lat), 
                           colour="blue", size=2.5)#site 2
         
         ## Create df for site 1 index plot
-        x.1 <- sites.df[, 5]
+        #x.1 <- sites.df[, 5]
+        x.1 <- sites.df[, 4]
         y.1 <- sites.df[, 2]
         dfall.1 <- data.frame(x.1=x.1, y.1=200-y.1)##Flipped i35
         dfsub.1 <- dfall.1[i, ]
@@ -154,7 +162,8 @@ for (i in 1:length(folds.no.7)){
                       legend.position = "none")
         
         ## Create df for site 2 index plot
-        x.2 <- sites.df[, 5]
+        #x.2 <- sites.df[, 5]
+        x.2 <- sites.df[, 4]
         y.2 <- sites.df[, 3]
         dfall.2 <- data.frame(x.2=x.2, y.2=200-y.2)##Flipped i35
         dfsub.2 <- dfall.2[i, ]
