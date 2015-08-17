@@ -200,6 +200,7 @@ for (i in 1:new.folds){#beware of change from folds.no.7
 ## gif animation creation. Ensure that you make a copy of the original png's before running
 
 #Rename png files to numbers to order correctly
+setwd("Z:\\DOCUMENTATION\\BART\\R\\R_DEV\\animation\\110078_ani_tifs_2015-08-12")
 png.list <- list.files(pattern = '*.png')
 nname <- sprintf("img-%d.png", seq(png.list))
 file.rename(png.list, nname)
