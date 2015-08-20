@@ -202,7 +202,8 @@ for (i in 1:new.folds){#beware of change from folds.no.7
 #Rename png files to numbers to order correctly
 setwd("Z:\\DOCUMENTATION\\BART\\R\\R_DEV\\animation\\110078_ani_tifs_2015-08-12")
 png.list <- list.files(pattern = '*.png')
-nname <- sprintf("img-%d.png", seq(png.list))
+#nname <- sprintf("%.4d.png", seq(png.list))
+#nname <- sprintf("img-%d.png", seq(png.list)) #Works for mp4
 file.rename(png.list, nname)
 
 ############################STAGE 5####################################################
